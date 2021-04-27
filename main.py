@@ -23,9 +23,7 @@ def heartbeat(interval, ws):
 
 ws = websocket.WebSocket()
 ws.connect("wss://gateway.discord.gg/?v=6&encording=json")
-heartbeat_interval = receive_json_response(ws)["d"]["heartbeat_interval"]
-heartbeat_interval = heartbeat_interval / 1000 #time.sleep uses seconds not milli seconds
-threading._start_new_thread(heartbeat, (heartbeat_interval, ws, ))
+threading.Thread(target=heartbeat,args=(30,ws)).start()
 
 channel_id = input("Enter Channel ID:")
 token = input("Enter Authorization Token:")
