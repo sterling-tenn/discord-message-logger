@@ -3,6 +3,7 @@ import json
 import threading
 import time
 import os
+import random
 
 def send_json_request(ws,request):
     ws.send(json.dumps(request))
@@ -12,18 +13,11 @@ def receive_json_response(ws):
     if response:
         return json.loads(response)
 
-def heartbeat(interval, ws):
+def heartbeat(interval,ws,heartbeat_JSON):
     while True:
         time.sleep(interval)
-        heartbeatJSON = {
-            "op": 1,
-            "d": "null"
-        }
-        send_json_request(ws, heartbeatJSON)
+        send_json_request(ws, heartbeat_JSON)
 
-ws = websocket.WebSocket()
-ws.connect("wss://gateway.discord.gg/?v=6&encording=json")
-threading.Thread(target=heartbeat,args=(30,ws)).start()
 
 channel_id = input("Enter Channel ID:")
 token = input("Enter Authorization Token:")
@@ -40,12 +34,24 @@ payload = {
         }
     }
 }
+heartbeat_JSON = {
+    "op": 1,
+    "d": "null"
+}
 
+ws = websocket.WebSocket()
+ws.connect("wss://gateway.discord.gg/?v=8&encoding=json")
+
+event = receive_json_response(ws)
+heartbeat_interval = event["d"]["heartbeat_interval"] / 1000 * random.random()
+threading.Thread(target=heartbeat,args=(heartbeat_interval,ws,heartbeat_JSON)).start()
 
 send_json_request(ws,payload)
 
 while True:
     event = receive_json_response(ws)
+    if event["op"]==1:
+        send_json_request(ws,heartbeat_JSON)
     try:
         if event["d"]["channel_id"]==channel_id:
             content = event["d"]["content"]
