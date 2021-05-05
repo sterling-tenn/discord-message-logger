@@ -6,12 +6,24 @@ import os
 import random
 
 def send_json_request(ws,request):
-    ws.send(json.dumps(request))
+    while True:
+        try:
+            ws.send(json.dumps(request))
+        except websocket.WebSocketConnectionClosedException:
+            ws.connect(websocket_url)
+            continue
+        break
 
 def receive_json_response(ws):
-    response = ws.recv()
-    if response:
-        return json.loads(response)
+    while True:
+        try:
+            response = ws.recv()
+            if response:
+                return json.loads(response)
+        except websocket.WebSocketConnectionClosedException:
+            ws.connect(websocket_url)
+            continue
+        break
 
 def heartbeat(interval,ws,heartbeat_JSON):
     while True:
@@ -19,6 +31,7 @@ def heartbeat(interval,ws,heartbeat_JSON):
         send_json_request(ws, heartbeat_JSON)
 
 
+websocket_url = "wss://gateway.discord.gg/?v=8&encoding=json"
 channel_id = input("Enter Channel ID:")
 token = input("Enter Authorization Token:")
 os.system("cls")
@@ -40,7 +53,7 @@ heartbeat_JSON = {
 }
 
 ws = websocket.WebSocket()
-ws.connect("wss://gateway.discord.gg/?v=8&encoding=json")
+ws.connect(websocket_url)
 
 event = receive_json_response(ws)
 heartbeat_interval = event["d"]["heartbeat_interval"] / 1000 * random.random()
