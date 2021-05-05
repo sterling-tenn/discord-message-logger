@@ -4,4 +4,4 @@ receives events from discord's gateway (wss://gateway.discord.gg/?v=8&encoding=j
 
 from the events, filters out the channel id, and the content of the message<br/>
 
-does not currently support logging embeds, outpu will be empty<br/>
+does not currently support logging embeds, output will be empty<br/>
