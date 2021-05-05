@@ -6,6 +6,7 @@ import os
 import random
 
 def send_json_request(ws,request):
+    global websocket_url
     while True:
         try:
             ws.send(json.dumps(request))
@@ -15,6 +16,7 @@ def send_json_request(ws,request):
         break
 
 def receive_json_response(ws):
+    global websocket_url
     while True:
         try:
             response = ws.recv()
