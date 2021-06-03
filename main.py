@@ -7,25 +7,22 @@ import random
 
 def send_json_request(ws,request):
     global websocket_url
-    while True:
-        try:
-            ws.send(json.dumps(request))
-        except websocket.WebSocketConnectionClosedException:
-            ws.connect(websocket_url)
-            continue
-        break
+    try:
+        ws.send(json.dumps(request))
+    except websocket.WebSocketConnectionClosedException:
+        ws.connect(websocket_url)
+        ws.send(json.dumps(request))
+
 
 def receive_json_response(ws):
     global websocket_url
-    while True:
-        try:
-            response = ws.recv()
-            if response:
-                return json.loads(response)
-        except websocket.WebSocketConnectionClosedException:
-            ws.connect(websocket_url)
-            continue
-        break
+    try:
+        response = ws.recv()
+        if response:
+            return json.loads(response)
+    except:
+        pass
+
 
 def heartbeat(interval,ws,heartbeat_JSON):
     while True:
