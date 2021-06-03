@@ -41,7 +41,6 @@ payload = {
     "op":2,
     "d":{
         "token":token,
-        "intents":513,
         "properties":{
             "$os":"windows",
             "$browser":"chrome",
